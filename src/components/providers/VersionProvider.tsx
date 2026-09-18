@@ -97,9 +97,9 @@ export function VersionProvider({ children }: { children: ReactNode }) {
         <motion.div
           key={activeVersion}
           className={activeVersion === "donut" ? "theme-donut" : ""}
-          initial={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
         >
           {children}
