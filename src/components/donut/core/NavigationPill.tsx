@@ -23,7 +23,7 @@ const NavigationPill = () => {
     <>
       <nav className="hidden md:flex fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-background border border-border/50 rounded-md p-1.5 shadow-sm">
         <ul className="flex items-center gap-1">
-          {NAVIGATION_ITEMS.map(({ href, label, icon: Icon }) => {
+          {NAVIGATION_ITEMS.filter(item => item.href !== "/#inspos").map(({ href, label, icon: Icon }) => {
             const isActive = activeSection === href;
             return (
               <li key={href} className="relative">
@@ -78,7 +78,7 @@ const NavigationPill = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="bg-background border border-border/50 rounded-md p-2 w-56 ml-4 mt-2 shadow-lg">
-              {NAVIGATION_ITEMS.map(({ href, label, icon: Icon }) => {
+              {NAVIGATION_ITEMS.filter(item => item.href !== "/#inspos").map(({ href, label, icon: Icon }) => {
                 const isActive = activeSection === href;
                 return (
                   <DropdownMenuItem key={href} asChild className={cn("rounded-md mb-1", isActive && "bg-primary/10 text-brand font-medium")}>

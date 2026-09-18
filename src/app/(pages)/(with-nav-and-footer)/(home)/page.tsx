@@ -16,6 +16,7 @@ import TechnologiesMarqueeCupcake from "@/components/cupcake/home/TechnologiesMa
 
 // Donut Imports
 import BioDonut from "@/components/donut/home/Bio";
+import BlogsListDonut from "@/components/donut/blogs/BlogsList";
 import CertificationsGridDonut from "@/components/donut/home/CertificationsGrid";
 import ExperienceTimelineDonut from "@/components/donut/home/ExperienceTimeline";
 import HeroSectionDonut from "@/components/donut/core/HeroSection";
@@ -50,6 +51,7 @@ const HomePageDonut = () => (
     <ExperienceTimelineDonut />
     <RecommendationLettersDonut />
     <ProjectsGridDonut />
+    <BlogsListDonut />
     <ReachOutDonut />
   </div>
 );
