@@ -43,6 +43,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand: var(--brand);
+  --font-display: var(--font-display);
 
   --perspective-1000: 1000px;
   --transform-style-3d: preserve-3d;
@@ -51,14 +53,15 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --background: oklch(0.98 0.01 60);
+  --foreground: oklch(0.12 0.02 260);
+  --card: oklch(0.98 0.01 60);
+  --card-foreground: oklch(0.12 0.02 260);
+  --popover: oklch(0.98 0.01 60);
+  --popover-foreground: oklch(0.12 0.02 260);
+  --primary: oklch(0.12 0.02 260);
+  --primary-foreground: oklch(0.98 0.01 60);
+  --brand: #412f57;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -85,14 +88,15 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --background: oklch(0.12 0.02 260);
+  --foreground: oklch(0.98 0.01 60);
+  --card: oklch(0.16 0.02 260);
+  --card-foreground: oklch(0.98 0.01 60);
+  --popover: oklch(0.16 0.02 260);
+  --popover-foreground: oklch(0.98 0.01 60);
+  --primary: oklch(0.98 0.01 60);
+  --primary-foreground: oklch(0.12 0.02 260);
+  --brand: #412f57;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -124,6 +128,30 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+.theme-donut {
+  --primary: #412f57;
+  --primary-foreground: oklch(0.98 0.01 60);
+}
+
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+@layer utilities {
+  .section-padding {
+    @apply px-6 sm:px-10 lg:px-20 py-16 sm:py-24;
+  }
+
+  .reveal-up {
+    @apply opacity-0 translate-y-8 transition-all duration-700 ease-out;
+  }
+  .reveal-up.is-revealed {
+    @apply opacity-100 translate-y-0;
   }
 }

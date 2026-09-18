@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import SectionHeader from "@/components/core/SectionHeader";
+import SectionHeader from "@/components/cupcake/core/SectionHeader";
 import { Button } from "@/components/ui/button";
 import {
   Popover,

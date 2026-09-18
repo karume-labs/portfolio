@@ -1,7 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import SectionHeader from "@/components/core/SectionHeader";
+import SectionHeader from "@/components/cupcake/core/SectionHeader";
 import { Badge } from "@/components/ui/badge";
 import { recommendationLetters } from "@/data/recommendation-letters";
 

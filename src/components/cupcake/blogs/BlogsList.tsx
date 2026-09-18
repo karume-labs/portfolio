@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BlogListItem, SectionHeader } from "@/components";
-import { useBlogs } from "@/components/blogs/BlogsProvider";
+import { useBlogs } from "@/components/cupcake/blogs/BlogsProvider";
 import { Button } from "@/components/ui/button";
 
 const BlogsList = () => {

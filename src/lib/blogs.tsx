@@ -3,7 +3,7 @@ import path from "node:path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { type CompileMDXResult, compileMDX } from "next-mdx-remote/rsc";
-import { Pre } from "@/components/core/Pre";
+import { Pre } from "@/components/cupcake/core/Pre";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";

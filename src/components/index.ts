@@ -1,27 +1,26 @@
-import { BlogListItem } from "@/components/blogs/BlogListItem";
-import BlogsList from "@/components/blogs/BlogsList";
-import { BlogsProvider } from "@/components/blogs/BlogsProvider";
-import { ExplainDropdown } from "@/components/blogs/ExplainDropdown";
-import TableOfContentsCard from "@/components/blogs/TableOfContentsCard";
-import BackToTopButton from "@/components/core/BackToTopButton";
-import ChangeMetadataTitleOnBlur from "@/components/core/ChangeMetadataTitleOnBlur";
-import Footer from "@/components/core/Footer";
-import HeroSection from "@/components/core/HeroSection";
-import NavigationPill from "@/components/core/NavigationPill";
-import ScrollProgress from "@/components/core/ScrollProgress";
-import SectionHeader from "@/components/core/SectionHeader";
-import ViewResumeButton from "@/components/core/ViewResumeButton";
-import Bio from "@/components/home/Bio";
-import CertificationsGrid from "@/components/home/CertificationsGrid";
-import ContactMeFormDialog from "@/components/home/ContactMeDialog";
-import ExperienceTimeline from "@/components/home/ExperienceTimeline";
-import Inspos from "@/components/home/Inspos";
-import RatesTeaser from "@/components/home/RatesTeaser";
-import ReachOut from "@/components/home/ReachOut";
-import RecommendationLetters from "@/components/home/RecommendationLetters";
-import { SubscribeForm } from "@/components/home/SubscribeForm";
-import TechnologiesMarquee from "@/components/home/TechnologiesMarquee";
-import ProjectsGrid from "@/components/projects/ProjectsGrid";
+import { BlogListItem } from "@/components/cupcake/blogs/BlogListItem";
+import BlogsList from "@/components/cupcake/blogs/BlogsList";
+import { BlogsProvider } from "@/components/cupcake/blogs/BlogsProvider";
+import { ExplainDropdown } from "@/components/cupcake/blogs/ExplainDropdown";
+import TableOfContentsCard from "@/components/cupcake/blogs/TableOfContentsCard";
+import BackToTopButton from "@/components/cupcake/core/BackToTopButton";
+import ChangeMetadataTitleOnBlur from "@/components/cupcake/core/ChangeMetadataTitleOnBlur";
+import Footer from "@/components/cupcake/core/Footer";
+import HeroSection from "@/components/cupcake/core/HeroSection";
+import NavigationPill from "@/components/cupcake/core/NavigationPill";
+import ScrollProgress from "@/components/cupcake/core/ScrollProgress";
+import SectionHeader from "@/components/cupcake/core/SectionHeader";
+import ViewResumeButton from "@/components/cupcake/core/ViewResumeButton";
+import Bio from "@/components/cupcake/home/Bio";
+import CertificationsGrid from "@/components/cupcake/home/CertificationsGrid";
+import ContactMeFormDialog from "@/components/cupcake/home/ContactMeDialog";
+import ExperienceTimeline from "@/components/cupcake/home/ExperienceTimeline";
+import Inspos from "@/components/cupcake/home/Inspos";
+import ReachOut from "@/components/cupcake/home/ReachOut";
+import RecommendationLetters from "@/components/cupcake/home/RecommendationLetters";
+import { SubscribeForm } from "@/components/cupcake/home/SubscribeForm";
+import TechnologiesMarquee from "@/components/cupcake/home/TechnologiesMarquee";
+import ProjectsGrid from "@/components/cupcake/projects/ProjectsGrid";
 
 export {
   // core
@@ -43,7 +42,6 @@ export {
   ReachOut,
   RecommendationLetters,
   Inspos,
-  RatesTeaser,
   SubscribeForm,
   // projects
   ProjectsGrid,

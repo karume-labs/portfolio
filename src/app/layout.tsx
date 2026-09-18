@@ -1,9 +1,10 @@
 import "@/styles";
 
-import { Geist, Geist_Mono } from "next/font/google";
-import ChangeMetadataTitleOnBlur from "@/components/core/ChangeMetadataTitleOnBlur";
-import SEOConfig, { metadataConfig } from "@/components/core/SEOConfig";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
+import ChangeMetadataTitleOnBlur from "@/components/cupcake/core/ChangeMetadataTitleOnBlur";
+import SEOConfig, { metadataConfig } from "@/components/cupcake/core/SEOConfig";
 import { Toaster } from "@/components/ui/sonner";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,12 +16,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const outfit = Outfit({
+  variable: "--font-display",
+  subsets: ["latin"],
+});
+
 export const metadata = metadataConfig;
 
 interface RootLayoutProps extends Readonly<{ children: React.ReactNode }> {}
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+import { VersionProvider } from "@/components/providers/VersionProvider";
 
 const RootLayout: React.FC<RootLayoutProps> = async ({ children }) => {
   return (
@@ -30,14 +37,18 @@ const RootLayout: React.FC<RootLayoutProps> = async ({ children }) => {
       </head>
 
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} antialiased min-h-screen flex flex-col`}
         id="root"
       >
         <SmoothScrollProvider>
           <NuqsAdapter>
-            <ChangeMetadataTitleOnBlur />
-            <Toaster richColors />
-            {children}
+            <Suspense fallback={null}>
+              <VersionProvider>
+                <ChangeMetadataTitleOnBlur />
+                <Toaster richColors />
+                {children}
+              </VersionProvider>
+            </Suspense>
           </NuqsAdapter>
         </SmoothScrollProvider>
       </body>

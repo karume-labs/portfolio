@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import BusinessCardOG from "@/components/core/BusinessCardOG";
+import BusinessCardOG from "@/components/cupcake/core/BusinessCardOG";
 
 export const size = {
   width: 1200,

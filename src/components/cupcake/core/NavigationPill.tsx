@@ -49,14 +49,17 @@ const NavigationPill = () => {
             </Tooltip>
           ))}
 
-          <div className="h-8 rounded-full w-0.5 bg-primary-foreground" />
+
+
           <ViewResumeButton />
         </NavigationMenuList>
       </NavigationMenu>
 
       <div className="md:hidden fixed top-4 left-0 right-0 z-50 flex justify-between px-4">
         <DropdownMenu open={open} onOpenChange={setOpen}>
-          <DropdownMenuTrigger className="px-2 rounded-md bg-primary/95 backdrop-blur-sm hover:bg-primary/80 transition-colors">
+          <DropdownMenuTrigger
+            className="px-2 rounded-md bg-primary/95 backdrop-blur-sm hover:bg-primary/80 transition-colors"
+          >
             <div className="relative size-6">
               <MenuIcon
                 className={cn(
@@ -91,8 +94,10 @@ const NavigationPill = () => {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        <div className="flex gap-2">
 
-        <ViewResumeButton />
+          <ViewResumeButton />
+        </div>
       </div>
     </>
   );

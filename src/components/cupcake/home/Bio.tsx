@@ -1,4 +1,4 @@
-import SectionHeader from "@/components/core/SectionHeader";
+import SectionHeader from "@/components/cupcake/core/SectionHeader";
 import { TypographyP } from "@/components/ui/typography";
 
 const Bio = () => {
