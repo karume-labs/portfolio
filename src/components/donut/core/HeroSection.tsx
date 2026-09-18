@@ -28,21 +28,27 @@ const HeroSection = () => {
   const [activeId, setActiveId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Generate icons for the left column (constrained area)
-    const generated = SKILLS.map((skill, i) => ({
+    // Specific positions for the 4 skills to form a box around the text
+    // 0: FRONTEND (Top Left)
+    // 1: BACKEND (Top Right)
+    // 2: MOBILE (Bottom Left)
+    // 3: BLOCKCHAIN (Bottom Right)
+    const positions = [
+      { top: 0, left: 0 },     // 0: FRONTEND (Top Left)
+      { top: 0, left: 100 },   // 1: BACKEND (Top Right)
+      { top: 100, left: 0 },   // 2: MOBILE (Bottom Left)
+      { top: 100, left: 100 }, // 3: BLOCKCHAIN (Bottom Right)
+    ];
+
+    const generated = SKILLS.filter(skill => skill.title !== "TUTORIAL").map((skill, i) => ({
       ...skill,
       id: i,
-      top: Math.random() * 80 + 10, // 10% to 90% vertical
-      left: Math.random() * 80 + 10, // 10% to 90% horizontal
-      duration: 15 + Math.random() * 10,
-      xRange: Math.random() * 30 - 15,
-      yRange: Math.random() * 20 - 10,
+      top: positions[i]?.top || 50,
+      left: positions[i]?.left || 50,
+      duration: 15 + Math.random() * 5,
+      xRange: Math.random() * 10 - 5, // smaller range so they stay near corners
+      yRange: Math.random() * 10 - 5,
     }));
-
-    for (let i = generated.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [generated[i], generated[j]] = [generated[j], generated[i]];
-    }
 
     setFloatingIcons(generated);
   }, []);
@@ -78,77 +84,83 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* Skill Cloud contained within the left column */}
-          <div className="absolute inset-0 z-10 pointer-events-auto">
-            {floatingIcons.map(
-              ({
-                id,
-                title,
-                description,
-                icon: Icon,
-                top,
-                left,
-                duration,
-                xRange,
-                yRange,
-              }) => (
-                <motion.div
-                  key={id}
-                  className="absolute"
-                  style={{ top: `${top}%`, left: `${left}%` }}
-                  animate={{
-                    x: [0, xRange, -xRange, 0],
-                    y: [0, yRange, -yRange, 0],
-                  }}
-                  transition={{
-                    duration: activeId === id ? duration * 3 : duration,
-                    repeat: Infinity,
-                    ease: [0.25, 0.1, 0.25, 1],
-                  }}
-                >
-                  <Popover onOpenChange={(open) => setActiveId(open ? id : null)}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="default"
-                        size="icon"
-                        className="rounded-md w-12 h-12 sm:w-14 sm:h-14 shadow-sm bg-background hover:bg-brand border border-border text-foreground hover:text-white transition-all group"
-                      >
-                        <Icon className="size-5 sm:size-6 text-primary group-hover:text-white transition-colors" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="max-w-xs bg-background border-border shadow-md rounded-md z-50">
-                      <div className="font-display font-bold text-lg mb-1">{title}</div>
-                      <TypographyP className="text-xs sm:text-sm text-muted-foreground">
-                        {description}
-                      </TypographyP>
-                    </PopoverContent>
-                  </Popover>
-                </motion.div>
-              ),
-            )}
-          </div>
         </div>
 
-        {/* Right Column: Framed Photo */}
+        {/* Right Column: Framed Photo & Skill Cloud */}
         <div className="lg:col-span-5 relative flex justify-center items-center h-full min-h-[400px]">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-            className="relative w-full max-w-[400px] aspect-[4/5] mx-auto z-20 group"
+            className="relative w-full max-w-[400px] aspect-[4/5] mx-auto z-20 group/card"
           >
             {/* Decorative background shapes */}
-            <div className="absolute inset-0 bg-brand/10 rounded-md translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-6 group-hover:translate-y-6" />
+            <div className="absolute inset-0 bg-brand/10 rounded-md translate-x-4 translate-y-4 transition-transform duration-500 group-hover/card:translate-x-6 group-hover/card:translate-y-6" />
             
             <div className="absolute inset-0 rounded-md overflow-hidden border border-border bg-muted">
               <Image
                 alt="A photo of Daniel Karume"
                 src={MeWEBP}
                 fill
-                className="object-cover object-top mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-700 ease-in-out"
+                className="object-cover object-top mix-blend-luminosity opacity-90 group-hover/card:mix-blend-normal group-hover/card:opacity-100 transition-all duration-700 ease-in-out"
                 priority
               />
-              <div className="absolute inset-0 bg-brand/5 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-brand/5 mix-blend-overlay group-hover/card:opacity-0 transition-opacity duration-700" />
+            </div>
+
+            {/* Skill Cloud positioned around the image */}
+            <div className="absolute inset-0 z-30 pointer-events-auto">
+              {floatingIcons.map(
+                ({
+                  id,
+                  title,
+                  description,
+                  icon: Icon,
+                  top,
+                  left,
+                  duration,
+                  xRange,
+                  yRange,
+                }) => (
+                  <motion.div
+                    key={id}
+                    className="absolute"
+                    style={{ 
+                      top: `${top}%`, 
+                      left: `${left}%`,
+                      marginTop: "-28px", // Center the 56px icon
+                      marginLeft: "-28px"
+                    }}
+                    animate={{
+                      x: [0, xRange, -xRange, 0],
+                      y: [0, yRange, -yRange, 0],
+                    }}
+                    transition={{
+                      duration: activeId === id ? duration * 3 : duration,
+                      repeat: Infinity,
+                      ease: [0.25, 0.1, 0.25, 1],
+                    }}
+                  >
+                    <Popover onOpenChange={(open) => setActiveId(open ? id : null)}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="default"
+                          size="icon"
+                          className="rounded-md w-12 h-12 sm:w-14 sm:h-14 shadow-sm bg-background hover:bg-brand border border-border text-foreground hover:text-white transition-all group/btn"
+                        >
+                          <Icon className="size-5 sm:size-6 text-primary group-hover/btn:text-white transition-colors" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="max-w-xs bg-background border-border shadow-md rounded-md z-50">
+                        <div className="font-display font-bold text-lg mb-1">{title}</div>
+                        <TypographyP className="text-xs sm:text-sm text-muted-foreground">
+                          {description}
+                        </TypographyP>
+                      </PopoverContent>
+                    </Popover>
+                  </motion.div>
+                ),
+              )}
             </div>
           </motion.div>
         </div>

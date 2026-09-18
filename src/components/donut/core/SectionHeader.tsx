@@ -54,14 +54,23 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, className }) => {
   return (
     <div 
       ref={containerRef} 
-      className={`sticky top-20 z-40 bg-background/90 backdrop-blur-md py-4 mb-8 w-fit ${isCentered ? "mx-auto text-center" : ""} ${className || ""}`}
+      className={`sticky top-20 z-40 bg-background/95 backdrop-blur-md py-4 mb-8 w-fit ${isCentered ? "mx-auto text-center" : ""} ${className || ""}`}
     >
-      <TypographyH2
-        ref={textRef}
-        className="font-display font-bold text-lg sm:text-xl tracking-widest uppercase pr-4"
-      >
-        {displayText}
-      </TypographyH2>
+      <div className="grid">
+        {/* Invisible final text sets the container size */}
+        <TypographyH2
+          className="col-start-1 row-start-1 font-display font-bold text-lg sm:text-xl tracking-widest uppercase opacity-0 pointer-events-none select-none border-b-0 pb-0"
+        >
+          {title}
+        </TypographyH2>
+        {/* Visible scrambling text overlaps perfectly */}
+        <TypographyH2
+          ref={textRef}
+          className="col-start-1 row-start-1 font-display font-bold text-lg sm:text-xl tracking-widest uppercase whitespace-nowrap border-b-0 pb-0"
+        >
+          {displayText}
+        </TypographyH2>
+      </div>
       <div className={`h-[3px] w-full bg-border/50 mt-2 rounded-full overflow-hidden ${isCentered ? "mx-auto" : ""}`}>
         {target ? (
           <ProgressBar target={target} isCentered={isCentered} />

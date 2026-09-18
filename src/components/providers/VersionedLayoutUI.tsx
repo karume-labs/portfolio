@@ -1,7 +1,5 @@
 "use client";
 
-import AnimatedCursor from "react-animated-cursor";
-import { useVersion } from "./VersionProvider";
 
 // Cupcake Imports
 import NavigationPillCupcake from "@/components/cupcake/core/NavigationPill";
@@ -11,8 +9,8 @@ import FooterCupcake from "@/components/cupcake/core/Footer";
 
 // Donut Imports
 import NavigationPillDonut from "@/components/donut/core/NavigationPill";
-import ScrollProgressDonut from "@/components/donut/core/ScrollProgress";
 import FooterDonut from "@/components/donut/core/Footer";
+import { useVersion } from "@/components/providers/VersionProvider";
 
 interface VersionedLayoutUIProps {
   children: React.ReactNode;
@@ -39,7 +37,6 @@ export function VersionedLayoutUI({ children }: VersionedLayoutUIProps) {
     <>
       <NavigationPillDonut />
 
-      <ScrollProgressDonut />
       {/* Donut doesn't have a floating back to top button, it's inside the footer */}
       <main className="flex-1 bg-background">{children}</main>
       <FooterDonut />

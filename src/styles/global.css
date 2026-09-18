@@ -145,7 +145,7 @@
 
 @layer utilities {
   .section-padding {
-    @apply px-6 sm:px-10 lg:px-20 py-16 sm:py-24;
+    @apply px-6 sm:px-10 lg:px-20 py-12 sm:py-16;
   }
 
   .reveal-up {

@@ -17,7 +17,7 @@ const ExperienceTimeline = () => {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section className="section-padding overflow-hidden" id="experience">
+    <section className="section-padding" id="experience">
       <div className="max-w-4xl mx-auto">
         <SectionHeader title="EXPERIENCE" />
 
