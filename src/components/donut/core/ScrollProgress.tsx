@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSmoothScroll } from "@/components/providers/SmoothScrollProvider";
 
 const ScrollProgress = () => {
+  const lenis = useSmoothScroll();
   const [progress, setProgress] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const ticking = useRef(false);
@@ -43,10 +45,16 @@ const ScrollProgress = () => {
   const scrollToPercentage = (pct: number) => {
     const docHeight =
       document.documentElement.scrollHeight - window.innerHeight;
-    window.scrollTo({
-      top: (pct / 100) * docHeight,
-      behavior: "auto",
-    });
+    const targetY = (pct / 100) * docHeight;
+    
+    if (lenis) {
+      lenis.scrollTo(targetY, { immediate: true });
+    } else {
+      window.scrollTo({
+        top: targetY,
+        behavior: "auto",
+      });
+    }
   };
 
   const handleClickOrDrag = (clientY: number) => {

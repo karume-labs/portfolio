@@ -1,10 +1,14 @@
 "use client";
 
 import Lenis from "lenis";
-import { useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+
+const SmoothScrollContext = createContext<Lenis | null>(null);
+
+export const useSmoothScroll = () => useContext(SmoothScrollContext);
 
 export const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
-  const lenisRef = useRef<Lenis | null>(null);
+  const [lenisInstance, setLenisInstance] = useState<Lenis | null>(null);
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -18,7 +22,7 @@ export const SmoothScrollProvider = ({ children }: { children: React.ReactNode }
       infinite: false,
     });
 
-    lenisRef.current = lenis;
+    setLenisInstance(lenis);
 
     // Handle all internal anchor clicks
     const handleAnchorClick = (e: MouseEvent) => {
@@ -65,5 +69,9 @@ export const SmoothScrollProvider = ({ children }: { children: React.ReactNode }
     };
   }, []);
 
-  return <>{children}</>;
+  return (
+    <SmoothScrollContext.Provider value={lenisInstance}>
+      {children}
+    </SmoothScrollContext.Provider>
+  );
 };

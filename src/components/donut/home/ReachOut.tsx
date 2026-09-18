@@ -9,10 +9,10 @@ import { TypographyH2, TypographyP } from "@/components/ui/typography";
 
 const ReachOut = () => {
   return (
-    <section id="reach-out" className="section-padding relative overflow-hidden">
+    <section id="reach-out" className="section-padding relative">
       {/* Background elements */}
-      <div className="absolute inset-0 bg-brand/5 -z-20" />
-      <div className="absolute bottom-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-brand/10 via-background/5 to-transparent -z-10" />
+      <div className="absolute inset-0 bg-brand/5 -z-20 clip-path-inset-0" />
+      <div className="absolute bottom-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-brand/10 via-background/5 to-transparent -z-10 clip-path-inset-0" />
       
       <div className="max-w-7xl mx-auto">
         <SectionHeader title="REACH OUT" />
