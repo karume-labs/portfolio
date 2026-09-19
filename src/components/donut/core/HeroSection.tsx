@@ -173,12 +173,11 @@ const HeroSection = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
       >
-        <span className="text-xs font-medium tracking-widest uppercase font-display">Scroll</span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          <ChevronDown className="size-5" />
+          <ChevronDown className="size-10" />
         </motion.div>
       </motion.div>
       

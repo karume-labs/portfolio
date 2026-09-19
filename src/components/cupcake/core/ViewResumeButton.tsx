@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const ViewResumeButton = () => {
   return (
-    <Button className="flex items-center gap-2" asChild>
+    <Button variant="outline" className="flex items-center gap-2" asChild>
       <Link
         href={"/core/daniel-karume-resume.pdf" as Route}
         target="_blank"

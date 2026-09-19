@@ -65,7 +65,7 @@ export const TECHNOLOGIES: Technology[] = [
   },
   {
     href: "https://zustand-demo.pmnd.rs/",
-    badgeUrl: "https://img.shields.io/badge/Zustand-000000?style=for-the-badge&logo=react&logoColor=white",
+    badgeUrl: "https://img.shields.io/badge/Zustand-000000?style=for-the-badge&logo=zustand&logoColor=white",
     label: "Zustand",
   },
   {
