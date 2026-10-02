@@ -107,9 +107,22 @@ I implemented a strict multiplexing queue. If a user opens the chat and asks a q
 
 #### 6. Building a Web Harness for Rapid Testing
 
-Testing LLM tweaks by constantly recompiling a React Native app is incredibly slow—it takes roughly an hour for my app to compile on my machine (an Intel i7-8650U with 16GB of RAM, and I use Arch btw). To move faster, I built a local testing harness using Bun. 
+Testing LLM tweaks by constantly recompiling a React Native app is incredibly slow - it takes roughly an hour for my app to compile on my machine (an Intel i7-8650U with 16GB of RAM and I use Arch btw). To move faster, I built a local testing harness using Bun. 
 
 A simple script automatically pulls the latest SQLite database from my physical Android device via [ADB](https://developer.android.com/tools/adb) (a command-line tool for talking to Android phones). It mocks the React Native SQLite client, uses `drizzle-orm/bun-sqlite` and spins up [`node-llama-cpp`](https://withcatai.github.io/node-llama-cpp/) to run the exact same `SmolLM2` model locally on my machine. Finally, it serves a simple HTML web interface on `localhost:3000`. This allows me to rapidly iterate on prompt engineering, context compression and RAG retrieval against real-world device data in milliseconds, without ever touching the mobile emulator.
+
+#### 7. Fuck Around and Find Out
+
+At its core, AI and machine learning remain a bit of a black box. The best way to get the results you want on mobile hardware is to turn the knobs, experiment as much as you can and adopt a "fuck around and find out" mindset.
+
+<div className="flex justify-center w-full my-8">
+  <img src="/blogs/cover-images/experimentation.jpg" alt="Experimentation is key" className="rounded-xl shadow-lg max-h-[400px] object-contain" />
+</div>
+
+If you want to move beyond simple string matching and build a massive automated CI pipeline to test your model's accuracy, here are two excellent frameworks you can use to evaluate your LLM locally:
+
+* **DeepEval (by Confident AI):** This is a Python-based framework that operates like `pytest` for LLMs. It is heavily focused on RAG (Retrieval-Augmented Generation) and features built-in metrics like `AnswerRelevancyMetric` and `FaithfulnessMetric`. You would use this if you wanted a larger model to grade Penny's answers (e.g., "Did Penny accurately extract the transaction data without inventing numbers?").
+* **Ragas:** Specifically designed for evaluating RAG pipelines. While Penny's "retrieval" is just an exact SQLite query, Ragas could help you evaluate whether the local LLM is properly utilizing the context you inject into it.
 
 ---
 
@@ -117,4 +130,4 @@ A simple script automatically pulls the latest SQLite database from my physical 
 
 On-device AI isn't just a gimmick for flagship phones anymore. The hardware constraints of budget mobile devices are severe, but they force us to build smarter, more resilient software. 
 
-By combining tightly scoped agentic workflows, sub-0.5B parameter models, aggressive quantization and defensive hardware fallbacks, you can deliver instant, private and capable LLM experiences entirely on the edge. The "No Backend" paradigm is here, and it's running in our pockets.
+By combining tightly scoped agentic workflows, sub-0.5B parameter models, aggressive quantization and defensive hardware fallbacks, you can deliver instant, private and capable LLM experiences entirely on the edge. The "No Backend" paradigm is here and it's running in our pockets.
