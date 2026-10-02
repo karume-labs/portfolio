@@ -1,31 +1,29 @@
----
-
-title: "Edgerunner: Running LLMs on the Edge"
+title: "Edgerunner: Running SLMs on the Edge"
 description: "A deep dive into running local AI on mid-range Android devices, featuring aggressive optimizations from building the Pennywise app."
 date: "2026-10-02"
-slug: "edgerunner-running-llms-on-the-edge"
-image: "/blogs/cover-images/edgerunner-running-llms-on-the-edge.png"
+slug: "edgerunner-running-slms-on-the-edge"
+image: "/blogs/cover-images/edgerunner-running-slms-on-the-edge.png"
 caption: "A meme based on true events"
 tags:
   - mobile
   - ai
   - react-native
-  - llm
+  - slm
   - performance
   - architecture
   - sqlite
 readingTime: "10 min"
-TL;DR: "Running AI on budget phones works by using tiny models, compressing context and treating the LLM as a lightweight coordinator instead of a massive reasoning engine."
+TL;DR: "Running AI on budget phones works by using tiny models, compressing context and treating the SLM as a lightweight coordinator instead of a massive reasoning engine."
 
 ---
 
 ### Introduction
 
-The era of relying exclusively on expensive, cloud-hosted APIs for AI is shifting. We are now entering a phase where running Large Language Models (LLMs) directly on mobile devices is not just possible, but highly practical.
+The era of relying exclusively on expensive, cloud-hosted APIs for AI is shifting. We are now entering a phase where running Small Language Models (SLMs)—highly optimized, miniature versions of Large Language Models (LLMs)—directly on mobile devices is not just possible, but highly practical.
 
 Moving AI inference to the edge fundamentally changes how we build applications. **Privacy** becomes absolute - if a user is querying sensitive financial or personal data, those tokens never leave the physical device. Furthermore, it introduces a **"No Backend" paradigm**. By eliminating cloud inference, you strip away API costs, server latency and the need for constant internet connectivity.
 
-However, running neural networks on pocket-sized hardware comes with severe architectural trade-offs that require ruthless optimization. I recently tackled this while building **Penny**, the local LLM for **Pennywise** (an AI-powered financial tracker built with React Native). Here is how I got a fully local LLM running reliably on mid-range Android hardware (Redmi Note 13 4G).
+However, running neural networks on pocket-sized hardware comes with severe architectural trade-offs that require ruthless optimization. I recently tackled this while building **Penny**, the local SLM for **Pennywise** (an AI-powered financial tracker built with React Native). Here is how I got a fully local SLM running reliably on mid-range Android hardware (Redmi Note 13 4G).
 
 ---
 
@@ -34,16 +32,16 @@ However, running neural networks on pocket-sized hardware comes with severe arch
 Before writing any code, you have to respect the physical limits of mobile devices.
 
 * **Storage (ROM):** Users will uninstall your app if it demands a 2GB model download just to boot up. Models must be heavily compressed.
-* **Memory (RAM):** Mobile operating systems are aggressive. If your LLM demands too much memory android's Out-Of-Memory (OOM) killer will silently terminate your application in the background. Memory bandwidth is also the primary bottleneck for inference speed - moving weights from RAM to the processor is often slower than the actual computation.
+* **Memory (RAM):** Mobile operating systems are aggressive. If your SLM demands too much memory android's Out-Of-Memory (OOM) killer will silently terminate your application in the background. Memory bandwidth is also the primary bottleneck for inference speed - moving weights from RAM to the processor is often slower than the actual computation.
 * **Processing Power:** Mid-range chipsets (Snapdragon, MediaTek, Exynos) cannot sustain heavy computational loads without rapid thermal throttling and extreme battery drain.
 
 ---
 
 ### Strategy: What Do You Actually Want the Model to Do?
 
-If you try to pack a massive reasoning engine into a phone, you will fail. Phones lack the RAM and thermal capacity for large models to solve complex logic internally. Instead, adopt an [agentic architecture](https://www.promptingguide.ai/research/llm-agents): treat the LLM not as an all-knowing brain, but as a lightweight coordinator that delegates hard tasks to traditional, highly-optimized code.
+If you try to pack a massive reasoning engine into a phone, you will fail. Phones lack the RAM and thermal capacity for large models to solve complex logic internally. Instead, adopt an [agentic architecture](https://www.promptingguide.ai/research/llm-agents): treat the SLM not as an all-knowing brain, but as a lightweight coordinator that delegates hard tasks to traditional, highly-optimized code.
 
-In Pennywise, the LLM isn't doing the heavy lifting. Exact financial math - sums, balances and rankings - is intercepted and solved deterministically by SQLite. The LLM is relegated to basic formatting and intent extraction. Narrowing the scope allowed me to swap out heavy 1.5B/0.6B models for [HuggingFace's **SmolLM2-360M**](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct). A 360M parameter model is small enough that it doesn't saturate the LPDDR4X memory bus (the "highway" that moves data between RAM and the processor).
+In Pennywise, the SLM isn't doing the heavy lifting. Exact financial math - sums, balances and rankings - is intercepted and solved deterministically by SQLite. The SLM is relegated to basic formatting and intent extraction. Narrowing the scope allowed me to swap out heavy 1.5B/0.6B models for [HuggingFace's **SmolLM2-360M**](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct). A 360M parameter model is small enough that it doesn't saturate the LPDDR4X memory bus (the "highway" that moves data between RAM and the processor).
 
 ---
 
@@ -101,13 +99,13 @@ A small 360M parameter model is highly susceptible to getting stuck in "repetiti
 
 #### 5. Keeping the App Responsive (Queueing)
 
-Pennywise intercepts new SMS messages and asks the LLM to classify them silently. However, the UI thread must remain king.
+Pennywise intercepts new SMS messages and asks the SLM to classify them silently. However, the UI thread must remain king.
 
 I implemented a strict multiplexing queue. If a user opens the chat and asks a question while a background sync is running, the engine immediately aborts the background task, drops the background queue and dedicates 100% of the hardware resources to answering the user's prompt. The UI never freezes and the user never waits on background tasks.
 
 #### 6. Building a Web Harness for Rapid Testing
 
-Testing LLM tweaks by constantly recompiling a React Native app is incredibly slow - it takes roughly an hour for my app to compile on my machine (an Intel i7-8650U with 16GB of RAM and I use Arch btw). To move faster, I built a local testing harness using Bun. 
+Testing SLM tweaks by constantly recompiling a React Native app is incredibly slow - it takes roughly an hour for my app to compile on my machine (an Intel i7-8650U with 16GB of RAM and I use Arch btw). To move faster, I built a local testing harness using Bun. 
 
 A simple script automatically pulls the latest SQLite database from my physical Android device via [ADB](https://developer.android.com/tools/adb) (a command-line tool for talking to Android phones). It mocks the React Native SQLite client, uses `drizzle-orm/bun-sqlite` and spins up [`node-llama-cpp`](https://withcatai.github.io/node-llama-cpp/) to run the exact same `SmolLM2` model locally on my machine. Finally, it serves a simple HTML web interface on `localhost:3000`. This allows me to rapidly iterate on prompt engineering, context compression and RAG retrieval against real-world device data in milliseconds, without ever touching the mobile emulator.
 
@@ -119,10 +117,10 @@ At its core, AI and machine learning remain a bit of a black box. The best way t
   <img src="/blogs/cover-images/experimentation.jpg" alt="Experimentation is key" className="rounded-xl shadow-lg max-h-[400px] object-contain" />
 </div>
 
-If you want to move beyond simple string matching and build a massive automated CI pipeline to test your model's accuracy, here are two excellent frameworks you can use to evaluate your LLM locally:
+If you want to move beyond simple string matching and build a massive automated CI pipeline to test your model's accuracy, here are two excellent frameworks you can use to evaluate your SLM locally:
 
 * **DeepEval (by Confident AI):** This is a Python-based framework that operates like `pytest` for LLMs. It is heavily focused on RAG (Retrieval-Augmented Generation) and features built-in metrics like `AnswerRelevancyMetric` and `FaithfulnessMetric`. You would use this if you wanted a larger model to grade Penny's answers (e.g., "Did Penny accurately extract the transaction data without inventing numbers?").
-* **Ragas:** Specifically designed for evaluating RAG pipelines. While Penny's "retrieval" is just an exact SQLite query, Ragas could help you evaluate whether the local LLM is properly utilizing the context you inject into it.
+* **Ragas:** Specifically designed for evaluating RAG pipelines. While Penny's "retrieval" is just an exact SQLite query, Ragas could help you evaluate whether the local SLM is properly utilizing the context you inject into it.
 
 ---
 
@@ -130,4 +128,4 @@ If you want to move beyond simple string matching and build a massive automated 
 
 On-device AI isn't just a gimmick for flagship phones anymore. The hardware constraints of budget mobile devices are severe, but they force us to build smarter, more resilient software. 
 
-By combining tightly scoped agentic workflows, sub-0.5B parameter models, aggressive quantization and defensive hardware fallbacks, you can deliver instant, private and capable LLM experiences entirely on the edge. The "No Backend" paradigm is here and it's running in our pockets.
+By combining tightly scoped agentic workflows, sub-0.5B parameter models, aggressive quantization and defensive hardware fallbacks, you can deliver instant, private and capable SLM experiences entirely on the edge. The "No Backend" paradigm is here and it's running in our pockets.
