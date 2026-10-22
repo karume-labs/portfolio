@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -21,7 +27,7 @@ export function VersionProvider({ children }: { children: ReactNode }) {
     defaultValue: "donut",
     parse: (value) => (value === "cupcake" ? "cupcake" : "donut"),
   });
-  
+
   const [activeVersion, setActiveVersion] = useState<Version>("donut");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const searchParams = useSearchParams();
@@ -31,7 +37,7 @@ export function VersionProvider({ children }: { children: ReactNode }) {
     const vParam = searchParams.get("v");
     if (vParam && vParam !== "cupcake" && vParam !== "donut") {
       // nuqs will strip the parameter entirely when set to its defaultValue "donut"
-      setVersionQuery("donut"); 
+      setVersionQuery("donut");
     }
   }, [searchParams, setVersionQuery]);
 
@@ -44,28 +50,28 @@ export function VersionProvider({ children }: { children: ReactNode }) {
 
   const handleSetVersion = (newVersion: Version) => {
     if (newVersion === activeVersion || isTransitioning) return;
-    
+
     setIsTransitioning(true);
-    
+
     // Smooth scroll to top for the transition
     window.scrollTo({ top: 0, behavior: "smooth" });
-    
+
     // Wait for the scroll to initiate before starting the exit animation
     setTimeout(() => {
       setVersionQuery(newVersion);
       setActiveVersion(newVersion);
-      
+
       // Let the entry animation play out before lifting the transition lock
-      setTimeout(() => setIsTransitioning(false), 500); 
+      setTimeout(() => setIsTransitioning(false), 500);
     }, 200);
   };
 
   return (
-    <VersionContext.Provider 
-      value={{ 
-        version: activeVersion, 
+    <VersionContext.Provider
+      value={{
+        version: activeVersion,
         setVersion: handleSetVersion,
-        isTransitioning
+        isTransitioning,
       }}
     >
       <div className="hidden lg:block">
@@ -96,7 +102,9 @@ export function VersionProvider({ children }: { children: ReactNode }) {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeVersion}
-          className={activeVersion === "donut" ? "theme-donut" : ""}
+          className={
+            activeVersion === "donut" ? "theme-donut" : "theme-cupcake"
+          }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
