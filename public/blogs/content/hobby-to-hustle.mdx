@@ -1,0 +1,188 @@
+---
+title: "Hobby to Hustle: From Anime Voices to Audio Splitting"
+description: "How building a fun AI tool for anime clips taught me audio processing and diarization, which paved the way for building Audio Bench - a native desktop audio splitting app."
+date: "2026-10-22"
+slug: "hobby-to-hustle"
+image: "/blogs/cover-images/hobby-to-hustle.png"
+caption: "Megumi deserved better"
+tags:
+  - python
+  - rust
+  - tauri
+  - audio-processing
+  - ai
+  - career
+readingTime: "7 min"
+TL;DR: "Building a hobby project (Seiyuu) taught me audio diarization and speech boundaries - making it second nature when a client hired me to architect Audio Bench, a local-first desktop app for splitting scripted voice-over sessions."
+
+---
+
+### Introduction
+
+I recently built a mobile app called [Seiyuu](https://seiyuu-app.vercel.app/) to identify Japanese voice actors from anime audio recordings. It started out purely as a fun hobby project. But shortly after, a client reached out with a very specific, real-world engineering challenge: they needed a native desktop application to process, split and align long scripted voice-over recordings into hundreds of individual, perfectly formatted audio takes.
+
+That tool became **Audio Bench** (`audio-bench`).
+
+The audio segmentation and timestamping pipelines I had spent nights debugging for Seiyuu turned out to be the exact prerequisite knowledge needed to build Audio Bench. Building for fun forces you to solve real engineering problems without the safety net of an existing codebase. Here is how tinkering with anime clips evolved into building a high-performance desktop application.
+
+---
+
+### The Knowledge Transfer is Immediate: The Training Pipeline
+
+Before Seiyuu could identify voice actors from user recordings in the mobile app, it needed a clean, reliable dataset of reference voice profiles. Training or indexing against raw anime episodes is notoriously messy: speech is constantly drowned out by dramatic orchestral scores, action sound effects and overlapping dialogue.
+
+These audio processing steps were the engine behind my **offline dataset curation and training pipeline**. To turn raw anime episodes into high-quality training data, I had to isolate vocals and slice the audio into clean, speaker-specific samples.
+
+#### 1. Speaker Diarization
+
+[Speaker diarization](https://en.wikipedia.org/wiki/Speaker_diarisation) is the process of partitioning an audio stream into homogeneous segments according to speaker identity - essentially solving the problem of "who spoke when?".
+
+During dataset preparation, I needed to scan raw audio and extract precise start and end timestamps for each distinct character voice. I implemented [`pyannote/speaker-diarization-3.1`](https://huggingface.co/pyannote/speaker-diarization-3.1) from [`pyannote.audio`](https://github.com/pyannote/pyannote-audio). This required managing [Hugging Face](https://huggingface.co/) authentication runtimes and writing dynamic hardware auto-detection to route processing to [CUDA](https://developer.nvidia.com/cuda-zone) GPUs for speed, or CPU as a fallback.
+
+```python
+# General workflow: Hardware auto-detection with Pyannote
+import torch
+from pyannote.audio import Pipeline
+
+# 1. Load the pre-trained pipeline
+pipeline = Pipeline.from_pretrained(
+    "pyannote/speaker-diarization-3.1",
+    use_auth_token=os.getenv("HF_TOKEN")
+)
+
+# 2. Dynamically allocate compute (CUDA GPU with CPU fallback)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+pipeline.to(device)
+
+# 3. Extract speaker turns with start and end timestamps
+diarization = pipeline("audio_clip.wav")
+for turn, _, speaker in diarization.itertracks(yield_label=True):
+    print(f"[{turn.start:.2f}s - {turn.end:.2f}s] Speaker: {speaker}")
+```
+
+#### 2. Source Separation with Smart Caching
+
+Anime episodes are full of background music and sound effects that confuse speech models during training. Before diarizing or generating voice embeddings, I integrated [`demucs`](https://github.com/facebookresearch/demucs) via subprocess execution to isolate pure vocals. Crucially, I wrote a smart caching layer to check for existing `vocals.wav` files before running the expensive isolation process again, saving massive amounts of local compute.
+
+```python
+# General workflow: Demucs vocal isolation with filesystem caching
+import subprocess
+from pathlib import Path
+
+def isolate_vocals(audio_path: Path, output_dir: Path) -> Path:
+    cached_vocals = output_dir / "htdemucs" / audio_path.stem / "vocals.wav"
+
+    # Avoid redundant processing if already separated
+    if cached_vocals.exists():
+        return cached_vocals
+
+    # Isolate vocal tracks using Demucs two-stem mode
+    subprocess.run([
+        "demucs",
+        "-n", "htdemucs",
+        "--two-stems=vocals",
+        "-o", str(output_dir),
+        str(audio_path)
+    ], check=True)
+
+    return cached_vocals
+```
+
+---
+
+### Entering the Desktop: Architecting Audio Bench
+
+When the client approached me, their challenge was distinct from a mobile consumer app, but the underlying audio fundamentals were identical: taking messy, continuous recordings and turning them into pristine, isolated speech assets.
+
+The application, **Audio Bench**, tackles the voice-over **alignment problem**: voice actors record continuous 45-minute sessions covering ~500 scripted sentences. A missed pause or an accidental cough can shift every subsequent line ID, throwing the entire batch out of sync.
+
+To solve this, we architected a native, local-first desktop application with a decoupled monorepo:
+
+* **Tauri + Rust Backend Shell:** Audio files are large (45-minute uncompressed WAVs easily surpass hundreds of megabytes). Cloud uploads would be slow and introduce privacy concerns for unreleased scripts. Running [Tauri](https://tauri.app/) with a [Rust](https://www.rust-lang.org/) core means audio is read directly from disk with zero network hops.
+* **Pure Rust Audio Engine (`crates/audio-core`):** High-performance decoding, peak generation and PCM slicing powered by `symphonia` and `hound`, backed by FFmpeg sidecars for compressed containers.
+* **React + Mantine + Zustand Frontend:** A desktop workspace with keyboard-driven controls and [Wavesurfer.js](https://wavesurfer.xyz/) for silky waveform scrubbing.
+
+<div className="my-8 overflow-hidden rounded-xl border bg-card/50 shadow-sm">
+  <div className="border-b bg-muted/40 px-4 py-3">
+    <p className="font-semibold text-sm tracking-wide text-foreground">Audio Bench Architecture</p>
+  </div>
+  <div className="overflow-x-auto">
+    <table className="w-full text-left text-sm">
+      <thead className="border-b bg-muted/20 text-muted-foreground text-xs uppercase">
+        <tr>
+          <th className="px-4 py-3 font-semibold">Layer</th>
+          <th className="px-4 py-3 font-semibold">Location</th>
+          <th className="px-4 py-3 font-semibold">Tech Stack</th>
+          <th className="px-4 py-3 font-semibold">Responsibility</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-border/60">
+        <tr className="hover:bg-muted/30 transition-colors">
+          <td className="px-4 py-3 font-medium text-foreground">Frontend</td>
+          <td className="px-4 py-3 text-muted-foreground"><code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">apps/desktop</code></td>
+          <td className="px-4 py-3 text-muted-foreground">React, Mantine, Zustand, Wavesurfer.js</td>
+          <td className="px-4 py-3 text-muted-foreground">Waveform UI, scrubbing and keyboard shortcuts</td>
+        </tr>
+        <tr className="hover:bg-muted/30 transition-colors">
+          <td className="px-4 py-3 font-medium text-foreground">Backend Shell</td>
+          <td className="px-4 py-3 text-muted-foreground"><code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">apps/backend</code></td>
+          <td className="px-4 py-3 text-muted-foreground">Tauri, Rust</td>
+          <td className="px-4 py-3 text-muted-foreground">Native OS integration, sidecars and local file I/O</td>
+        </tr>
+        <tr className="hover:bg-muted/30 transition-colors">
+          <td className="px-4 py-3 font-medium text-foreground">Domain Logic</td>
+          <td className="px-4 py-3 text-muted-foreground"><code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">packages/domain</code></td>
+          <td className="px-4 py-3 text-muted-foreground">TypeScript, Zod</td>
+          <td className="px-4 py-3 text-muted-foreground">Naming templates, splitting rules and schema validation</td>
+        </tr>
+        <tr className="hover:bg-muted/30 transition-colors">
+          <td className="px-4 py-3 font-medium text-foreground">Audio Engine</td>
+          <td className="px-4 py-3 text-muted-foreground"><code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">crates/audio-core</code></td>
+          <td className="px-4 py-3 text-muted-foreground">Rust, Symphonia, Hound</td>
+          <td className="px-4 py-3 text-muted-foreground">48kHz conformed master, peak profiles and PCM slicing</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+#### The "Conformed Master" & Sample-Exact Timing
+
+One critical lesson from building Seiyuu was that mixing different sample rates (e.g., 44.1 kHz vs 48 kHz) or floating-point second timestamps introduces cumulative timing drift across long audio sessions.
+
+In Audio Bench, we established a **Conformed Master** rule:
+1. Immediately upon import, the source audio is downmixed to mono and resampled to an internal **24-bit / 48 kHz PCM WAV master**.
+2. All timestamps in the UI, database and slicing math are stored as exact **integer sample indices** (at 48,000 samples per second) rather than floats.
+
+#### Solving the Alignment Drift with the "Count Gate"
+
+Audio Bench uses frame-energy analysis over the master track to propose slice boundaries around speech onsets and offsets. But automated detection isn't infallible.
+
+To prevent mislabeled audio, we implemented the **Count Gate**:
+* The app cross-references *Detected Clips* against *Expected Script Lines* (e.g., 493 detected vs. 500 script rows).
+* If counts disagree, the user is alerted to the drift point. With dedicated keyboard shortcuts (`S` to split, `M` to merge, `A` to approve), an audio engineer can review 500 cuts in minutes.
+* At export time, each clip automatically receives a **5-second padded window** on both ends with a 5ms edge fade, export-ready for DAWs alongside a formatted `manifest.csv`.
+
+---
+
+### You Build an Unfair Hackathon Advantage
+
+Hackathons and client contracts are won by execution speed. When you regularly build complete hobby projects, you develop a personal arsenal of boilerplate code, deployment strategies and proven architectural patterns.
+
+Because I had already wrestled with Python environment variables, audio sub-processes and local Docker networking while building Seiyuu, I didn't have to spend days learning how audio streams work under the hood. Whether building an automated WhatsApp educational tool like EduBot or an audio workbench, you spend your time focusing purely on the domain logic and user experience, rather than fighting audio decoders.
+
+---
+
+### The Accidental Product Boom
+
+Passion projects have a habit of finding an audience because they solve a real pain point you personally experienced.
+
+Seiyuu evolved from a local Python script running `htdemucs` into a full mobile app with a waitlist, offline queueing and many more features. Even if a hobby project doesn't become the next massive startup, having a live, deployed product is the ultimate proof of execution.
+
+When a client asks for a desktop app like Audio Bench to split audio recordings by speaker, having already wrestled with raw audio formats, separation models and timestamps makes the job straightforward. You've already made the mistakes and solved the edge cases on your own time.
+
+---
+
+### Conclusion
+
+Hobby projects are the best sandbox for your engineering career. They provide a low-stakes space to master interesting tooling before you ever need to apply it for real work. Keep building those "silly" side projects - you never know when a simple audio splitting script is going to solve a client's problem tomorrow.
