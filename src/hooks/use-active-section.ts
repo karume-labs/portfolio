@@ -1,10 +1,35 @@
-import { useState, useEffect } from 'react';
-import { NAVIGATION_ITEMS } from '@/data/navigation-items';
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { NAVIGATION_ITEMS } from "@/data/navigation-items";
 
 export function useActiveSection() {
-  const [activeSection, setActiveSection] = useState(NAVIGATION_ITEMS[0].href);
+  const pathname = usePathname();
+
+  const getSectionFromPathname = (path: string) => {
+    if (path.startsWith("/blogs")) return "/#blogs";
+    if (path.startsWith("/projects")) return "/#projects";
+    if (path.startsWith("/certificates")) return "/#certifications";
+    return "/";
+  };
+
+  const [activeSection, setActiveSection] = useState(() =>
+    getSectionFromPathname(pathname),
+  );
 
   useEffect(() => {
+    if (pathname.startsWith("/blogs")) {
+      setActiveSection("/#blogs");
+      return;
+    }
+    if (pathname.startsWith("/projects")) {
+      setActiveSection("/#projects");
+      return;
+    }
+    if (pathname.startsWith("/certificates")) {
+      setActiveSection("/#certifications");
+      return;
+    }
+
     const visibleSections = new Set<string>();
 
     const callback = (entries: IntersectionObserverEntry[]) => {
@@ -19,7 +44,7 @@ export function useActiveSection() {
 
       // Check if at the top of the page
       if (window.scrollY < 100) {
-        setActiveSection('/');
+        setActiveSection("/");
         return;
       }
 
@@ -33,11 +58,11 @@ export function useActiveSection() {
     };
 
     const observer = new IntersectionObserver(callback, {
-      rootMargin: '-20% 0px -40% 0px',
+      rootMargin: "-20% 0px -40% 0px",
     });
 
     NAVIGATION_ITEMS.forEach((item) => {
-      if (item.href.startsWith('/#')) {
+      if (item.href.startsWith("/#")) {
         const id = item.href.substring(2);
         const element = document.getElementById(id);
         if (element) {
@@ -47,7 +72,7 @@ export function useActiveSection() {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return activeSection;
 }
